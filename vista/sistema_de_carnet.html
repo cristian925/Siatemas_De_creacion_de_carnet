@@ -1,0 +1,1254 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Emisión de Carnets - Distrito de Armenia</title>
+     <link rel="stylesheet" href="../estilos/estilo.css">
+     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <!-- Tailwind CSS para diseño moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ 
+</head>
+<body class="text-gray-800">
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar Navegación -->
+            <aside class="w-64 bg-gray-50 border-r border-gray-200 shadow-inner flex flex-col no-print z-10">
+                <div class="p-4 space-y-2">
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Módulos</div>
+                    <button onclick="app.changeView('form')" id="nav-form" class="w-full text-left p-3 rounded-lg font-semibold flex items-center transition-all bg-blue-100 text-institucional border border-blue-200 shadow-sm">
+                        <i class="fas fa-keyboard w-6 text-lg"></i> <span>1. Inscripción Datos</span>
+                    </button>
+                    <button
+    onclick="app.saveDataAndPreview('preview-carnet')"
+    id="nav-preview"
+    class="w-full text-left p-3 rounded-lg font-semibold flex items-center transition-all text-gray-600 hover:bg-gray-200">
+
+    <i class="fas fa-id-badge w-6 text-lg"></i>
+    <span>2. Imprimir PVC</span>
+
+</button>
+                    <button onclick="app.changeView('preview-carta')" id="nav-letter" class="w-full text-left p-3 rounded-lg font-semibold flex items-center transition-all text-gray-600 hover:bg-gray-200">
+                        <i class="fas fa-file-signature w-6 text-lg"></i> <span>3. Carta Autorización</span>
+                    </button>
+                </div>
+                <div class="mt-auto p-4 text-xs text-gray-400 text-center border-t">
+                    v2.0 - SMECIP Local
+                </div>
+            </aside>
+
+            <!-- Área Principal de Contenido -->
+            <main class="flex-1 p-6 overflow-y-auto bg-gray-100 relative">
+                    <!-- =========================================
+     PANEL: FORMULARIO
+     ========================================= -->
+
+<div id="panel-form"
+     class="max-w-6xl mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-1">
+
+    <!-- ENCABEZADO -->
+    <div class="bg-gray-50 p-4 border-b border-gray-200 flex justify-between items-center rounded-t-xl">
+
+        <h2 class="text-xl font-bold text-gray-800">
+            <i class="fas fa-user-edit text-institucional"></i>
+            Formulario de Inscripción de Menor
+        </h2>
+
+        <div class="flex space-x-2">
+
+            <button
+                onclick="app.clearForm()"
+                class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-100 transition text-sm font-bold shadow-sm">
+
+                <i class="fas fa-eraser"></i>
+                Limpiar
+
+            </button>
+
+            <button
+                onclick="app.guardarCarnet()"
+                class="bg-institucional text-white px-5 py-1.5 rounded-lg hover:bg-blue-800 transition font-bold shadow-md">
+
+                <i class="fas fa-save"></i>
+                Guardar y Seguir
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <
+    <!-- =========================================
+     SELECTOR CON BUSCADOR DE PERSONAS
+     ========================================= -->
+
+<div class="mx-6 mt-5 mb-2 p-4 bg-blue-50 border border-blue-200 rounded-lg no-print">
+
+    <label class="block text-xs font-bold text-gray-600 uppercase mb-2">
+        Buscar persona registrada
+    </label>
+
+    <select
+        id="selector-personas"
+        class="w-full"
+        onchange="app.cargarPersonaExistente(this.value)">
+
+        <option value="">
+            Escriba Nº de carnet, nombre o apellido...
+        </option>
+
+    </select>
+
+    <div
+        id="estado-busqueda"
+        class="text-xs text-gray-500 mt-2">
+
+        Seleccione una persona registrada para cargar sus datos.
+
+    </div>
+
+</div>
+
+        
+
+
+    <!-- =========================================
+         FORMULARIO
+         ========================================= -->
+
+    <form
+        id="main-form"
+        onsubmit="event.preventDefault();"
+        class="p-6 grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+
+        <!-- Lado Izquierdo: FRENTE DEL CARNET -->
+        <div class="space-y-6">
+
+            <div class="border-2 border-blue-100 rounded-lg p-5 bg-white relative">
+
+                <span class="absolute -top-3 left-4 bg-blue-100 text-institucional px-2 py-0.5 text-xs font-bold rounded border border-blue-200 uppercase tracking-wide">
+                    Datos del Frente
+                </span>
+
+
+                <!-- Nº CARNET / AÑO / FECHA EXPEDICIÓN -->
+                <div class="grid grid-cols-3 gap-4 mb-4 mt-2">
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Nº Carnet
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_carnet_num"
+                            class="w-full border-b-2 border-gray-300 focus:border-institucional outline-none p-1 text-sm font-bold text-red-600 bg-gray-50"
+                            required
+                            placeholder="Ej. 328">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Año
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_anio"
+                            class="w-full border-b-2 border-gray-300 focus:border-institucional outline-none p-1 text-sm font-bold bg-gray-50"
+                            value="2026">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            F. Expedición
+                        </label>
+
+                        <input
+                            type="date"
+                            id="f_fecha_emision"
+                            class="w-full border-b-2 border-gray-300 focus:border-institucional outline-none p-1 text-sm font-bold bg-gray-50">
+
+                    </div>
+
+                </div>
+
+
+                <!-- NOMBRES / APELLIDOS -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Nombres
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_nombres"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold focus:ring-1 focus:ring-institucional"
+                            required>
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Apellidos
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_apellidos"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold focus:ring-1 focus:ring-institucional"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GÉNERO / NACIONALIDAD / SANGRE -->
+                <div class="grid grid-cols-3 gap-3 mb-4">
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Género
+                        </label>
+
+                        <select
+                            id="f_genero"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm font-semibold">
+
+                            <option value="MASCULINO">
+                                MASCULINO
+                            </option>
+
+                            <option value="FEMENINO">
+                                FEMENINO
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Nacionalidad
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_nacionalidad"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold"
+                            value="SALVADOREÑA">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Tipo Sangre
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_sangre"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold"
+                            placeholder="O+">
+
+                    </div>
+
+                </div>
+
+
+                <!-- FECHA / LUGAR NACIMIENTO -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Fecha de Nacimiento
+                        </label>
+
+                        <input
+                            type="date"
+                            id="f_fecha_nac"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm font-semibold">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">
+                            Lugar de Nacimiento
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_lugar_nac"
+                            class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold">
+
+                    </div>
+
+                </div>
+
+
+                <!-- PADRES -->
+                <h4 class="text-[11px] font-bold text-gray-500 uppercase mt-4 border-b pb-1 mb-2">
+                    Datos de los Padres
+                </h4>
+
+
+                <div class="grid grid-cols-1 gap-3">
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">
+                            Nombre Completo del Padre
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_padre"
+                            class="w-full border-b border-gray-300 p-1 text-sm uppercase font-semibold focus:border-institucional outline-none bg-gray-50">
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">
+                            Nombre Completo de la Madre
+                        </label>
+
+                        <input
+                            type="text"
+                            id="f_madre"
+                            class="w-full border-b border-gray-300 p-1 text-sm uppercase font-semibold focus:border-institucional outline-none bg-gray-50">
+
+                    </div>
+
+                </div>
+
+            </div>
+                            <!-- Panel de Captura Biométrica -->
+                            <div class="border-2 border-gray-200 rounded-lg p-5 bg-gray-50 relative">
+                                <span class="absolute -top-3 left-4 bg-gray-200 text-gray-700 px-2 py-0.5 text-xs font-bold rounded border border-gray-300 uppercase tracking-wide">Multimedia / Biometría</span>
+                                <div class="grid grid-cols-3 gap-4 text-center mt-2">
+                                    <!-- Foto -->
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 mb-2 uppercase">Fotografía</label>
+                                        <div class="border-2 border-dashed border-gray-400 rounded-lg bg-white h-28 flex items-center justify-center cursor-pointer hover:bg-blue-50 transition relative overflow-hidden group shadow-inner" onclick="document.getElementById('file_foto').click()">
+                                            <img id="preview_img_foto" src="" class="absolute inset-0 w-full h-full object-cover hidden">
+                                            <div class="flex flex-col items-center group-hover:text-institucional text-gray-400" id="icon_foto">
+                                                <i class="fas fa-camera text-3xl mb-1"></i>
+                                                <span class="text-[10px] font-bold">Cargar</span>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="file_foto" accept="image/*" class="hidden" onchange="app.handleImageUpload(this, 'foto')">
+                                    </div>
+                                    <!-- Firma -->
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 mb-2 uppercase">Firma (Menor)</label>
+                                        <div class="border-2 border-dashed border-gray-400 rounded-lg bg-white h-28 flex items-center justify-center cursor-pointer hover:bg-blue-50 transition relative overflow-hidden group shadow-inner" onclick="document.getElementById('file_firma').click()">
+                                            <img id="preview_img_firma" src="" class="absolute inset-0 w-full h-full object-contain hidden p-2">
+                                            <div class="flex flex-col items-center group-hover:text-institucional text-gray-400" id="icon_firma">
+                                                <i class="fas fa-signature text-3xl mb-1"></i>
+                                                <span class="text-[10px] font-bold">Cargar</span>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="file_firma" accept="image/*" class="hidden" onchange="app.handleImageUpload(this, 'firma')">
+                                    </div>
+                                    <!-- Huella -->
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 mb-2 uppercase">Huella Digital</label>
+                                        <div class="border-2 border-dashed border-gray-400 rounded-lg bg-white h-28 flex items-center justify-center cursor-pointer hover:bg-blue-50 transition relative overflow-hidden group shadow-inner" onclick="document.getElementById('file_huella').click()">
+                                            <img id="preview_img_huella" src="" class="absolute inset-0 w-full h-full object-contain hidden p-2 mix-blend-multiply">
+                                            <div class="flex flex-col items-center group-hover:text-institucional text-gray-400" id="icon_huella">
+                                                <i class="fas fa-fingerprint text-3xl mb-1"></i>
+                                                <span class="text-[10px] font-bold">Cargar</span>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="file_huella" accept="image/*" class="hidden" onchange="app.handleImageUpload(this, 'huella')">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lado Derecho: VUELTO DEL CARNET -->
+                        <div class="space-y-6">
+                            <div class="border-2 border-green-100 rounded-lg p-5 bg-white relative">
+                                <span class="absolute -top-3 left-4 bg-green-100 text-green-800 px-2 py-0.5 text-xs font-bold rounded border border-green-200 uppercase tracking-wide">Datos del Vuelto</span>
+                                
+                                <div class="mb-4 mt-2">
+                                    <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Dirección / Residencia</label>
+                                    <textarea id="f_direccion" class="w-full border border-gray-300 rounded p-2 text-sm uppercase font-semibold focus:ring-1 focus:ring-green-500" rows="2"></textarea>
+                                </div>
+
+                                <!-- Grid Físico y Partida -->
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="bg-gray-50 border border-gray-200 rounded p-3">
+                                        <h4 class="text-[10px] font-bold text-gray-700 uppercase mb-2 text-center bg-gray-200 py-1">Descripción Física</h4>
+                                        <div class="space-y-2">
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Color Piel</label>
+                                                <input type="text" id="f_color_piel" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Color Ojos</label>
+                                                <input type="text" id="f_color_ojos" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Color Pelo</label>
+                                                <input type="text" id="f_color_cabello" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gray-50 border border-gray-200 rounded p-3">
+                                        <h4 class="text-[10px] font-bold text-gray-700 uppercase mb-2 text-center bg-gray-200 py-1">Partida de Nacimiento</h4>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Año</label>
+                                                <input type="text" id="f_p_anio" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Libro</label>
+                                                <input type="text" id="f_p_libro" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Folio</label>
+                                                <input type="text" id="f_p_folio" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Tomo</label>
+                                                <input type="text" id="f_p_tomo" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                             <div>
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Partida</label>
+                                                <input type="text" id="f_p_partida" class="w-full border-b border-gray-300 text-xs uppercase font-semibold outline-none bg-transparent">
+                                            </div>
+                                            <div class="col-span-2">
+                                                <label class="text-[10px] font-bold text-gray-500 uppercase">Tipo Trámite</label>
+                                                <select id="f_tramite" class="w-full border-b border-gray-300 text-xs font-semibold outline-none bg-transparent pb-1">
+                                                    <option value="PRIMERA VEZ">PRIMERA VEZ</option>
+                                                    <option value="REPOSICION">REPOSICION</option>
+                                                    <option value="RENOVACION">RENOVACION</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Señales Especiales</label>
+                                    <input type="text" id="f_senales" class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold bg-yellow-50" value="NINGUNA">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Centro de Estudio o Lugar de Trabajo</label>
+                                    <input type="text" id="f_centro_estudio" class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Profesión u Oficio</label>
+                                        <input type="text" id="f_profesion" class="w-full border border-gray-300 rounded p-1.5 text-sm uppercase font-semibold" value="ESTUDIANTE">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Estado Familiar</label>
+                                        <select id="f_estado_fam" class="w-full border border-gray-300 rounded p-1.5 text-sm font-semibold">
+                                            <option value="SOLTERO(A)">SOLTERO(A)</option>
+                                            <option value="CASADO(A)">CASADO(A)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-3 border-t border-gray-200 pt-4 bg-gray-50 -mx-5 px-5 rounded-b-lg">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">F. Vencimiento</label>
+                                        <input type="date" id="f_fecha_venc" class="w-full border border-gray-300 rounded p-1.5 text-xs font-bold text-red-700 bg-white shadow-inner">
+                                    </div>
+                                    <!-- <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Valor Carnet</label>
+                                        <input type="text" id="f_valor" class="w-full border border-gray-300 rounded p-1.5 text-xs font-bold bg-white" value="0.00">
+                                    </div>-->
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-gray-600 uppercase mb-1">Nº Hacienda</label>
+                                        <input type="text" id="f_serie_mh" class="w-full border border-gray-300 rounded p-1.5 text-xs font-bold uppercase text-blue-800 bg-white" placeholder="306194 A">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- =========================================
+                     PANEL: PREVISUALIZACIÓN CARNET PVC
+                     ========================================= -->
+                <div id="panel-preview-carnet" class="hidden-view">
+                    <div class="flex justify-between items-center mb-6 no-print max-w-4xl mx-auto bg-white p-4 rounded-lg shadow border">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-id-card"></i> Vista de Impresión (PVC CR80)</h2>
+                            <p class="text-xs text-gray-500">Diseño nativo horizontal para impresora de tarjetas (Fargo, Zebra).</p>
+                        </div>
+                        <button onclick="window.print()" class="bg-institucional text-white px-6 py-2 rounded-lg hover:bg-blue-800 font-bold shadow-lg flex items-center gap-2 transition-transform active:scale-95">
+                            <i class="fas fa-print text-xl"></i> Imprimir Tarjeta
+                        </button>
+                    </div>
+
+                    <!-- Contenedor que será visible en la impresión -->
+                    <div class="print-area-carnet flex flex-col items-center justify-center gap-6 no-print-bg pb-10">
+                        
+                        <!-- ================= FRENTE ================= -->
+                        <div>
+                            <p class="text-center font-bold text-gray-400 mb-2 no-print tracking-widest text-sm uppercase">Frente</p>
+                            
+                            <div class="carnet-pvc">
+                                <!-- Background Watermark -->
+                                <img id="render_escudo_agua" src="" class="c-escudo-agua hidden">
+                                
+                                <!-- Floating Text (As in template) -->
+                                <div class="c-gobierno-floating">
+                                    <img id="render_logo_flotante" src="../img/sonsonate-este_azul.png" class="c-logo-float" style=" position: absolute;left: 46%;top: 58%;transform: translate(-55%, -60%); width: 160px;height: auto;opacity: 0.08;object-fit: contain;pointer-events: none;z-index: 1;">
+                                </div>
+                                <div class="c-gobierno-floating">
+                                    <img id="render_logo_flotante" src="../img/departamento-este.png" class="c-logo-float"   style="position: absolute;right: 85px;bottom: -62px;width: 48px;height: auto;opacity: 0.85;z-index: 3;">
+                                </div>
+                                <div class="c-gobierno-floating">
+                                    <img id="render_logo_flotante" src="../img/sello_alcalde.png" class="c-logo-float"   style="position: absolute;right: 185px;bottom: -62px;width: 58px;height: auto;opacity: 0.85;z-index: 3;">
+                                </div>
+
+                                <!-- Header Horizontal -->
+                                <div class="c-header">
+                                    <img id="render_logo_izq"  src="../img/logo_gobierno_blanco.png" alt="L" class="c-logo-left" style="width: 45px; height: auto;">
+                                    <div class="c-header-text">
+                                        <h1>GOBIERNO MUNICIPAL SONSONATE ESTE</h1>
+                                        <h2>DISTRITO DE ARMENIA</h2>
+                                        <h3>CARNET DE IDENTIFICACIÓN PERSONAL</h3>
+                                    </div>
+                                    <img id="render_logo_der" src="../img/logo_este-blaco.png" alt="R" class="c-logo-right " style="width: 45px; height: auto;">
+                                </div>
+                                
+                                <!-- Body Horizontal -->
+                                <div class="c-body-landscape">
+                                    <!-- Columna Izquierda (Foto y Carnet) -->
+                                    <div class="c-left-col">
+                                        <img id="render_foto" src="https://placehold.co/100x130/e2e8f0/94a3b8?text=FOTO" class="c-photo shadow-sm">
+                                        <div class="c-carnet-num-box">
+                                            <div class="c-carnet-label">Carnet Nº</div>
+                                            <div class="c-carnet-val" id="r_carnet">000</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Columna Derecha (Datos) -->
+                                    <div class="c-right-col">
+                                        <div class="c-row">
+                                            <div class="c-field" style="width: 55%;">
+                                                <span class="c-label">Nombres :</span>
+                                                <span class="c-value" id="r_nombres">---</span>
+                                            </div>
+                                            <div class="c-field" style="width: 45%;">
+                                                <span class="c-label">Apellidos :</span>
+                                                <span class="c-value" id="r_apellidos">---</span>
+                                            </div>
+                                        </div>
+                                        <div class="c-row">
+                                            <div class="c-field" style="width: 55%;">
+                                                <span class="c-label">Género :</span>
+                                                <span class="c-value" id="r_genero">---</span>
+                                            </div>
+                                            <div class="c-field" style="width: 45%;">
+                                                <span class="c-label">Nacionalidad :</span>
+                                                <span class="c-value" id="r_nacionalidad">SALVADOREÑA</span>
+                                            </div>
+                                        </div>
+                                        <div class="c-row-full">
+                                            <span class="c-label">Fecha y Lugar de Nacimiento :</span>
+                                            <span class="c-value-inline">
+                                                <span id="r_fecha_nac">---</span> , <span id="r_lugar_nac">---</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Firmas (Bottom) -->
+                                <div class="c-signatures-landscape">
+                                    <div class="c-sig-block">
+                                        <img id="render_sello_alcalde" src="" class="c-sello-img hidden">
+                                        <img id="render_firma_alcalde" src="../img/firma_alcalda.png" class="c-firma-img">
+                                        <div class="c-sig-title">Alcalde Municipal</div>
+                                    </div>
+                                    <div class="c-sig-block">
+                                        <img id="render_sello_jefe" src="" class="c-sello-img hidden">
+                                        <img id="render_firma_jefe" src="../img/firma_jerfe_azul.png" class="c-firma-img">
+                                        <div class="c-sig-title">Jefe del Registro del Estado Familiar</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ================= VUELTO ================= -->
+                        <div>
+                            <p class="text-center font-bold text-gray-400 mb-2 no-print tracking-widest text-sm uppercase">Vuelto</p>
+                            
+                            <div class="carnet-pvc">
+                                <div class="cv-body-landscape bg-white">
+                                    
+                                    <!-- Row 1: Direccion & Tramite -->
+                                    <div class="flex justify-between items-start cv-row">
+                                        <div class="flex-1 pr-2 leading-tight">
+                                            <span class="cv-label">Dirección :</span>
+                                            <span class="cv-value uppercase ml-1" id="r_direccion">---</span>
+                                        </div>
+                                        <div class="text-right leading-tight whitespace-nowrap pl-1">
+                                            <span class="cv-label">Tipo de Tramite :</span>
+                                            <span class="font-bold text-blue-700 text-[0.055in] uppercase tracking-wide ml-1" id="r_tramite">---</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 2: Madre -->
+                                    <div class="cv-row leading-tight">
+                                        <span class="cv-label block mb-[0.01in]">Nombre de la Madre o Tutora:</span>
+                                        <span class="cv-value uppercase block" id="r_madre_v">---</span>
+                                    </div>
+
+                                    <!-- Row 3: Padre -->
+                                    <div class="cv-row leading-tight">
+                                        <span class="cv-label block mb-[0.01in]">Nombre del Padre o Tutor:</span>
+                                        <span class="cv-value uppercase block" id="r_padre_v">---</span>
+                                    </div>
+
+                                    <!-- Row 4: Fisico -->
+                                    <div class="flex justify-between items-center cv-row leading-tight mt-[0.02in]">
+                                        <div><span class="cv-label">Color de Ojos :</span> <span class="cv-value uppercase ml-1" id="r_color_ojos">---</span></div>
+                                        <div><span class="cv-label">Color de Cabello :</span> <span class="cv-value uppercase ml-1" id="r_color_cabello">---</span></div>
+                                        <div><span class="cv-label">Color Piel :</span> <span class="cv-value uppercase ml-1" id="r_color_piel">---</span></div>
+                                        <div><span class="cv-label">Señales Especiales :</span> <span class="cv-value uppercase ml-1" id="r_senales">---</span></div>
+                                    </div>
+
+                                    <!-- Row 5: Estudio -->
+                                    <div class="cv-row leading-tight mt-[0.02in]">
+                                        <span class="cv-label block mb-[0.01in]">Centro de Estudios o Lugar de Trabajo :</span>
+                                        <span class="cv-value uppercase block truncate" id="r_centro_estudio">---</span>
+                                    </div>
+
+                                <!-- FOTO + FIRMA + HUELLA -->
+                                <div class="cv-biometria-footer">
+
+                                    <!-- FOTO -->
+                                    <div class="cv-biometria-item">
+                                        <img
+                                            id="render_foto_v"
+                                            src="https://placehold.co/100x130/e2e8f0/94a3b8?text=FOTO"
+                                            class="cv-foto-v">
+                                    </div>
+
+                                    <!-- FIRMA -->
+                                    <div class="cv-biometria-item">
+                                        <img
+                                            id="render_firma_menor_v"
+                                            src=""
+                                            class="cv-firma-v hidden">
+                                    </div>
+
+                                    <!-- HUELLA -->
+                                    <div class="cv-biometria-item">
+                                        <img
+                                            id="render_huella_v"
+                                            src=""
+                                            class="cv-huella-v">
+                                    </div>
+
+                                </div>
+
+                                  <!-- FECHAS DEL VUELTO -->
+                                <div style="
+                                    position: absolute;
+                                    right: 0.35in;
+                                    bottom: 0.45in;
+                                    width: 0.30in;
+                                    display: flex;
+                                    flex-direction: column;
+                                    text-align: left;
+                                    z-index: 5;
+                                ">
+
+                                    <span class="cv-label" style="font-size: 0.055in;">
+                                        Fecha de Vencimiento
+                                    </span>
+                                    <span class="cv-value" id="r_fecha_venc_v" style="
+                                        font-size: 0.08in;
+                                        font-weight: bold;
+                                        margin-bottom: 0.04in;
+                                    ">
+                                        ---
+                                    </span>
+
+                                    <span class="cv-label" style="font-size: 0.055in;">
+                                        Fecha de Expedición
+                                    </span>
+                                    <span class="cv-value" id="r_fecha_emision_v" style="
+                                        font-size: 0.08in;
+                                        font-weight: bold;
+                                    ">
+                                        ---
+                                    </span>
+
+                                </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- =========================================
+                     PANEL: CARTA DE AUTORIZACIÓN 
+                     ========================================= -->
+                <div id="panel-preview-carta" class="hidden-view">
+                    <div class="flex justify-between items-center mb-6 no-print max-w-4xl mx-auto bg-white p-4 rounded-lg shadow border">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-file-signature"></i> Carta de Autorización</h2>
+                            <p class="text-xs text-gray-500">Para impresión en hoja tamaño Carta (8.5" x 11")</p>
+                        </div>
+                        <button onclick="window.print()" class="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-black font-bold shadow-lg flex items-center gap-2">
+                            <i class="fas fa-print"></i> Imprimir Documento
+                        </button>
+                    </div>
+                        <div class="print-area-carta">
+
+    <div class="carta-page bg-white text-black font-serif text-sm">
+
+        <!-- =====================================================
+             ENCABEZADO
+             ===================================================== -->
+        <div class="grid grid-cols-[90px_1fr_90px] items-center border-b-2 border-black pb-2">
+
+            <!-- LOGO IZQUIERDO -->
+            <div class="flex justify-center">
+                <img src="../img/sonsonate-este_azul.png"
+                     style="width:75px; height:auto;">
+            </div>
+
+            <!-- TEXTO CENTRAL -->
+            <div class="text-center leading-tight">
+                <h1 class="text-[18px] font-bold">
+                    Alcaldía Municipal de Sonsonate Este, Distrito de Armenia
+                </h1>
+
+                <h2 class="text-[16px] font-semibold">
+                    Departamento de Sonsonate, El Salvador, C.A.
+                </h2>
+
+                <p class="text-[14px]">
+                    Teléfono(s) 2461-2300, 2461-0568
+                </p>
+
+                <p class="text-[14px]">
+                    Correo Electrónico: regfamiliar@alcaldiaarmenia.gob.sv
+                </p>
+            </div>
+
+            <!-- ESCUDO DERECHO -->
+            <div class="flex justify-center">
+                <img src="../img/gobierno.png"
+                     style="width:72px; height:auto;">
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             TÍTULO
+             ===================================================== -->
+        <div class="text-center border-b-2 border-black py-1">
+            <h2 class="font-bold text-[18px] uppercase tracking-wide">
+                Registro de Carnet de Identificación Personal
+            </h2>
+        </div>
+
+
+        <!-- =====================================================
+             PRIMER BLOQUE: FOTO + DATOS GENERALES
+             ===================================================== -->
+        <div class="border-2 border-black border-t-0">
+
+            <div class="flex">
+
+                <!-- FOTO -->
+                <div class="w-[150px] border-r border-black p-2 flex items-start justify-center">
+                    <img id="carta_foto"
+                         src="https://placehold.co/120x165/e2e8f0/94a3b8?text=FOTO"
+                         style="
+                            width:120px;
+                            height:165px;
+                            object-fit:cover;
+                         ">
+                </div>
+
+                <!-- DATOS -->
+                <div class="flex-1 p-2 text-[14px] leading-[1.5]">
+
+                    <!-- Primera fila -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <strong>Nº de Carnet:</strong>
+                            <span id="carta_reg_numero"
+                                  class="border-b border-black inline-block min-w-[120px]"></span>
+                        </div>
+
+                        <div>
+                            <strong>M. Hacienda:</strong>
+                            <span id="carta_reg_mh"
+                                  class="border-b border-black inline-block min-w-[90px]"></span>
+                        </div>
+
+                        <div>
+                            <strong>Vencimiento:</strong>
+                            <span id="carta_reg_vencimiento"
+                                  class="border-b border-black inline-block min-w-[100px]"></span>
+                        </div>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div>
+                        <strong>Nombre:</strong>
+                        <span id="carta_reg_nombre"
+                              class="border-b border-black inline-block w-[85%] uppercase"></span>
+                    </div>
+
+                    <!-- Género / Trámite -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <strong>Género:</strong>
+                            <span id="carta_reg_genero"
+                                  class="border-b border-black inline-block w-[70%] uppercase"></span>
+                        </div>
+
+                        <div>
+                            <strong>Tipo de Trámite:</strong>
+                            <span id="carta_reg_tramite"
+                                  class="border-b border-black inline-block w-[55%] uppercase"></span>
+                        </div>
+                    </div>
+
+                    <!-- Padre -->
+                    <div>
+                        <strong>Padre:</strong>
+                        <span id="carta_reg_padre"
+                              class="border-b border-black inline-block w-[87%] uppercase"></span>
+                    </div>
+
+                    <!-- Madre -->
+                    <div>
+                        <strong>Madre:</strong>
+                        <span id="carta_reg_madre"
+                              class="border-b border-black inline-block w-[86%] uppercase"></span>
+                    </div>
+
+                    <!-- Lugar y fecha nacimiento -->
+                    <div class="mt-1">
+                        <strong>Lugar y Fecha de Nacimiento:</strong>
+                        <div id="carta_reg_nacimiento"
+                             class="border-b border-black uppercase min-h-[24px]"></div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- =================================================
+                 FECHA Y LUGAR DE EXPEDICIÓN
+                 ================================================= -->
+            <div class="border-t border-black px-3 py-2 text-[14px]">
+
+                <div class="italic font-semibold">
+                    Fecha y Lugar de Expedición:
+                </div>
+
+                <div id="carta_reg_expedicion"
+                     class="uppercase">
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FIRMAS FUNCIONARIOS
+                 ================================================= -->
+            <div class="grid grid-cols-2 border-t border-black min-h-[110px]">
+
+                <!-- Alcalde -->
+                <div class="relative text-center flex flex-col justify-end pb-2">
+
+                    <img src="../img/firma_alcalda.png"
+                         style="
+                            position:absolute;
+                            width:161px;
+                            left:50%;
+                            bottom:23px;
+                            transform:translateX(-50%);
+                            height:auto;
+                         ">
+
+                    <div class="font-bold">
+                        Alcalde Municipal
+                    </div>
+
+                </div>
+
+                <!-- Jefe Registro -->
+                <div class="relative text-center flex flex-col justify-end pb-2">
+
+                    <img src="../img/jefe_ref.png"
+                         style="position:absolute;width:130px;left:50%;bottom:22px;transform:translateX(-50%);height:auto;object-fit:contain; ">
+
+                    <div class="font-bold">
+                        Jefe del Registro del Estado Familiar
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RESIDENCIA
+                 ================================================= -->
+            <div class="border-t-2 border-black px-2 py-1">
+                <strong>Residencia:</strong>
+                <span id="carta_reg_direccion"
+                      class="uppercase"></span>
+            </div>
+
+
+            <!-- =================================================
+                 DESCRIPCIÓN FÍSICA
+                 ================================================= -->
+            <div class="border-t border-black px-2 py-1">
+
+                <div class="grid grid-cols-3 gap-4">
+
+                    <div>
+                        <strong>Color de la Piel:</strong>
+                        <span id="carta_reg_piel"
+                              class="uppercase"></span>
+                    </div>
+
+                    <div>
+                        <strong>Ojos:</strong>
+                        <span id="carta_reg_ojos"
+                              class="uppercase"></span>
+                    </div>
+
+                    <div>
+                        <strong>Pelo:</strong>
+                        <span id="carta_reg_pelo"
+                              class="uppercase"></span>
+                    </div>
+
+                </div>
+
+                <div>
+                    <strong>Señales Especiales:</strong>
+                    <span id="carta_reg_senales"
+                          class="uppercase"></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div>
+                        <strong>Centro de Estudios o Lugar de Trabajo:</strong>
+                        <span id="carta_reg_centro"
+                              class="uppercase"></span>
+                    </div>
+
+                    <div>
+                        <strong>Tipo de Sangre:</strong>
+                        <span id="carta_reg_sangre"
+                              class="uppercase"></span>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+
+                    <div>
+                        <strong>Estado Familiar:</strong>
+                        <span id="carta_reg_estado"></span>
+                    </div>
+
+                    <div>
+                        <strong>Nombre del(a) Cónyuge:</strong>
+                        <span></span>
+                    </div>
+
+                </div>
+
+                <div>
+                    <strong>Profesión u Oficio:</strong>
+                    <span id="carta_reg_profesion"
+                          class="uppercase"></span>
+                </div>
+
+                <div>
+                    <strong>Nombre de la Madre:</strong>
+                    <span id="carta_reg_madre2"
+                          class="uppercase"></span>
+                </div>
+
+                <div>
+                    <strong>Nombre del Padre:</strong>
+                    <span id="carta_reg_padre2"
+                          class="uppercase"></span>
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 DATOS PARTIDA
+                 ================================================= -->
+            <div class="border-t border-black">
+
+                <div class="text-center font-bold text-[18px] py-1">
+                    DATOS DE LA INSCRIPCIÓN DE LA PARTIDA
+                </div>
+
+                <div class="grid grid-cols-5 gap-4 px-4 pb-2 text-center">
+
+                    <div>
+                        <strong>Año:</strong>
+                        <span id="carta_reg_p_anio"></span>
+                    </div>
+
+                    <div>
+                        <strong>Libro:</strong>
+                        <span id="carta_reg_p_libro"></span>
+                    </div>
+
+                    <div>
+                        <strong>Tomo:</strong>
+                        <span id="carta_reg_p_tomo"></span>
+                    </div>
+
+                    <div>
+                        <strong>Folio:</strong>
+                        <span id="carta_reg_p_folio"></span>
+                    </div>
+
+                    <div>
+                        <strong>Partida:</strong>
+                        <span id="carta_reg_p_partida"></span>
+                    </div>
+                    </div>
+
+                </div>
+
+            
+
+
+            <!-- =================================================
+                 DECLARACIÓN
+                 ================================================= -->
+            <div class="border-t-2 border-black">
+
+                <div class="text-center font-bold text-[17px] border-b border-black">
+                    DECLARACIÓN DE CONFORMIDAD
+                </div>
+
+                <p class="px-2 py-1 text-[14px] leading-tight text-justify">
+                    Habiendo revisado el contenido del presente Registro de Carnet
+                    de Identificación Personal, manifiesto mi conformidad con el mismo
+                    y firmo para constancia. Se estampa la huella digital del pulgar
+                    derecho por no saber firmar: ____________________________.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+                FIRMAS DEL SOLICITANTE
+                ===================================================== -->
+
+            <div class="carta-firmas grid grid-cols-2 gap-x-10 gap-y-3 mt-3 px-6">
+
+                <!-- FIRMA MENOR -->
+                <div class="text-center">
+
+                    <div class="h-[45px] flex justify-center items-end">
+                        <img id="carta_firma_menor"
+                            src=""
+                            style="
+                                max-width:170px;
+                                max-height:42px;
+                                object-fit:contain;
+                            ">
+                    </div>
+
+                    <div class="border-t border-black pt-1 font-bold italic">
+                        Firma del Solicitante
+                    </div>
+
+                </div>
+
+
+                <!-- HUELLA -->
+                <div class="text-center">
+
+                    <div class="h-[45px] flex justify-center items-end">
+                        <img id="carta_huella"
+                            src=""
+                            style="
+                                width:45px;
+                                height:45px;
+                                object-fit:contain;
+                            ">
+                    </div>
+
+                    <div class="border-t border-black pt-1 font-bold italic">
+                        Huella del Menor
+                    </div>
+
+                </div>
+
+
+                <!-- FIRMA RESPONSABLE -->
+                <div class="text-center">
+
+                    <div class="h-[38px]"></div>
+
+                    <div class="border-t border-black pt-1 font-bold italic">
+                        Firma del Responsable del Solicitante
+                    </div>
+
+                </div>
+
+
+                <!-- NOMBRE RESPONSABLE -->
+                <div class="text-center">
+
+                    <div id="carta_reg_responsable"
+                        class="h-[25px] uppercase font-semibold">
+                    </div>
+
+                    <div class="border-t border-black pt-1 font-bold italic">
+                        Nombre(s) y Apellido(s) del Responsable
+                    </div>
+
+                    <div class="text-left mt-1">
+                        <strong>DUI:</strong>
+                        ______________________
+                    </div>
+
+                </div>
+
+            </div>
+
+    </div>
+</div>
+                </div>
+
+                <!-- =========================================
+                     PANEL: AJUSTES (Solo Admin)
+                     ========================================= -->
+                <div id="panel-settings" class="hidden-view max-w-5xl mx-auto bg-white rounded-lg shadow-md border p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2"><i class="fas fa-shield-alt text-institucional"></i> Configuración del Sistema (Admin)</h2>
+                    <p class="mb-6 text-sm text-gray-600 border-b pb-4">Sube los recursos institucionales. Estos se guardarán en tu navegador automáticamente y se aplicarán a todos los carnets.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Logos y Fondo -->
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h3 class="font-bold text-institucional mb-4 text-lg border-b border-gray-200 pb-2"><i class="fas fa-images"></i> Logos y Marca de Agua</h3>
+                            
+                            <div class="mb-5">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Logo Superior Izquierdo (Escudo El Salvador)</label>
+                                <input type="file" id="sys_logo_izq" accept="image/png, image/jpeg" class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="app.saveSystemImage(this, 'sys_logo_izq')">
+                                <img id="preview_sys_logo_izq" class="h-16 mt-2 bg-white border border-gray-300 p-1 hidden object-contain">
+                            </div>
+                            <div class="mb-5">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Logo Superior Derecho (Escudo Armenia)</label>
+                                <input type="file" id="sys_logo_der" accept="image/png, image/jpeg" class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="app.saveSystemImage(this, 'sys_logo_der')">
+                                <img id="preview_sys_logo_der" class="h-16 mt-2 bg-white border border-gray-300 p-1 hidden object-contain">
+                            </div>
+                            <div class="mb-5">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Marca de Agua Central (Fondo del Carnet)</label>
+                                <input type="file" id="sys_escudo_agua" accept="image/png, image/jpeg" class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="app.saveSystemImage(this, 'sys_escudo_agua')">
+                                <img id="preview_sys_escudo_agua" class="h-20 mt-2 bg-white border border-gray-300 p-1 hidden object-contain">
+                            </div>
+                        </div>
+
+                        <!-- Firmas y Sellos Autoridad -->
+                        <div class="border border-gray-200 p-5 rounded-lg bg-gray-50">
+                            <h3 class="font-bold text-institucional mb-4 text-lg border-b border-gray-200 pb-2"><i class="fas fa-stamp"></i> Autoridades (Frente del Carnet)</h3>
+                            
+                            <!-- Alcalde -->
+                            <div class="mb-6 bg-white p-3 rounded border shadow-sm">
+                                <h4 class="font-bold text-sm text-gray-800 mb-3">1. Alcalde Municipal (Lado Izquierdo)</h4>
+                                <div class="mb-3">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Firma (Transparente recomendada)</label>
+                                    <input type="file" id="sys_firma_alcalde" accept="image/png, image/jpeg" class="w-full text-xs" onchange="app.saveSystemImage(this, 'sys_firma_alcalde')">
+                                    <img id="preview_sys_firma_alcalde" class="h-10 mt-1 bg-gray-100 border hidden object-contain">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Sello Redondo (Irá de fondo de la firma)</label>
+                                    <input type="file" id="sys_sello_alcalde" accept="image/png, image/jpeg" class="w-full text-xs" onchange="app.saveSystemImage(this, 'sys_sello_alcalde')">
+                                    <img id="preview_sys_sello_alcalde" class="h-16 mt-1 bg-gray-100 border hidden object-contain rounded-full">
+                                </div>
+                            </div>
+
+                            <!-- Jefe REF -->
+                            <div class="bg-white p-3 rounded border shadow-sm">
+                                <h4 class="font-bold text-sm text-gray-800 mb-3">2. Jefe del Registro (Lado Derecho)</h4>
+                                <div class="mb-3">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Firma (Transparente recomendada)</label>
+                                    <input type="file" id="sys_firma_jefe" accept="image/png, image/jpeg" class="w-full text-xs" onchange="app.saveSystemImage(this, 'sys_firma_jefe')">
+                                    <img id="preview_sys_firma_jefe" class="h-10 mt-1 bg-gray-100 border hidden object-contain">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Sello Redondo (Irá de fondo de la firma)</label>
+                                    <input type="file" id="sys_sello_jefe" accept="image/png, image/jpeg" class="w-full text-xs" onchange="app.saveSystemImage(this, 'sys_sello_jefe')">
+                                    <img id="preview_sys_sello_jefe" class="h-16 mt-1 bg-gray-100 border hidden object-contain rounded-full">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+      
+    <script src="../js/controlador_carnet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+</body>
+</html>
+            

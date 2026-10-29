@@ -1,0 +1,434 @@
+        /* =========================================
+           CARPETA: /css/styles.css
+           ========================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        
+        /* Colores Institucionales */
+        .bg-institucional { background-color: #0f3b76; }
+        .text-institucional { color: #0f3b76; }
+        .border-institucional { border-color: #0f3b76; }
+        
+        /* =========================================
+           ESTILOS DEL CARNET PVC (LANDSCAPE)
+           ========================================= */
+        /* Tamaño estándar CR80 Landscape: 3.375in ancho x 2.125in alto */
+      .carnet-pvc {
+            width: 3.375in;
+            height: 2.125in;
+            background: white;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0.1in;
+            box-sizing: border-box;
+            border: 1px solid #e5e7eb;
+        }
+        @media screen {
+    .carnet-pvc {
+        transform: scale(1.7);
+        transform-origin: center;
+        margin-top: 55px;
+        margin-bottom: 55px;
+    }
+}
+
+        /* Tamaño Carta (Letter) para la hoja de firmas */
+      /* =========================================
+   HOJA TAMAÑO CARTA
+   ========================================= */
+
+        .carta-page {
+            width: 8.5in;
+            min-height: 11in;
+            background: white;
+
+            padding: 0.40in 0.50in;
+
+            box-sizing: border-box;
+
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+            margin: 0 auto;
+        }
+
+        /* =========================================
+        IMPRESIÓN REGISTRO TAMAÑO CARTA
+        UNA SOLA PÁGINA
+        ========================================= */
+@media print {
+
+    @page {
+        size: Letter portrait;
+        margin: 0;
+    }
+
+    body.printing-carta .print-area-carta {
+        display: block !important;
+        width: 8.5in !important;
+        height: 11in !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.printing-carta .carta-page {
+        position: relative !important;
+
+        width: 8.5in !important;
+        height: 11in !important;
+        min-height: 11in !important;
+        max-height: 11in !important;
+
+        padding: 0.25in 0.45in !important;
+        margin: 0 !important;
+
+        box-sizing: border-box !important;
+        box-shadow: none !important;
+
+        overflow: hidden !important;
+    }
+
+    /* =========================================
+       FIRMAS ANCLADAS AL FINAL DE LA HOJA
+       ========================================= */
+
+    body.printing-carta .carta-firmas {
+        position: absolute !important;
+
+        left: 0.55in !important;
+        right: 0.55in !important;
+        bottom: 0.40in !important;
+
+        width: auto !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+
+        column-gap: 0.35in !important;
+        row-gap: 0.08in !important;
+    }
+
+    /* Firma solicitante / huella */
+    body.printing-carta .carta-firmas > div > div:first-child {
+        height: 0.30in !important;
+    }
+
+    /* Nombre responsable */
+    body.printing-carta .carta-firmas > div:last-child > div:first-child {
+        height: 0.17in !important;
+    }
+
+    /* DUI */
+    body.printing-carta .carta-firmas > div:last-child .text-left {
+        margin-top: 0 !important;
+        line-height: 1 !important;
+    }
+}
+        /* =========================================
+           REGLAS DE IMPRESIÓN (@media print)
+           ========================================= */
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            
+            body.printing-carnet .print-area-carnet { display: flex !important; flex-wrap: wrap; gap: 0.2in; justify-content: center; }
+            body.printing-carnet .print-area-carta { display: none !important; }
+            
+            body.printing-carta .print-area-carta { display: block !important; }
+            body.printing-carta .print-area-carnet { display: none !important; }
+            
+            .carnet-pvc, .carta-page { box-shadow: none; border: none; margin: 0; }
+            
+            /* Ajustes para impresora de PVC */
+            @page { margin: 0; } 
+        }
+
+        /* =========================================
+           DISEÑO INTERNO DEL CARNET - FRENTE (LANDSCAPE)
+           ========================================= */
+        .c-header { 
+            background: #0f3b76; 
+            color: white; 
+            text-align: center; 
+            padding: 0.04in 0.08in; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 0.45in;
+            position: relative;
+            z-index: 10;
+        }
+        .c-header-text { flex: 1; display: flex; flex-direction: column; justify-content: center; line-height: 1.1; }
+        .c-header h1 { font-size: 0.085in; margin: 0; font-weight: 900;}
+        .c-header h2 { font-size: 0.075in; margin: 0; font-weight: 700;}
+        .c-header h3 { font-size: 0.06in; margin: 0; font-weight: 900; margin-top: 1px; color: #e0e0e0;}
+        
+        .c-logo-left, .c-logo-right { height: 0.35in; width: 0.35in; object-fit: contain; background: transparent; }
+        
+        /* Marca de Agua Central */
+        .c-escudo-agua { 
+            position: absolute; 
+            top: 55%; 
+            right: 0.15in; 
+            transform: translateY(-50%); 
+            width: 1.6in; 
+            height: 1.6in; 
+            object-fit: contain; 
+            opacity: 0.15; 
+            z-index: 1; 
+        }
+
+        .c-body-landscape {
+            display: flex;
+            flex: 1;
+            padding: 0.05in 0.08in;
+            position: relative;
+            z-index: 2;
+        }
+
+        .c-left-col {
+            width: 0.85in;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .c-photo {
+            width: 0.8in;
+            height: 1.05in;
+            object-fit: cover;
+            border: 1px solid #0f3b76;
+            border-radius: 2px;
+            background: #f3f4f6;
+        }
+        .c-carnet-num-box {
+            text-align: center;
+            margin-top: 0.02in;
+        }
+        .c-carnet-label { font-size: 0.065in; font-weight: 900; color: #0f3b76; }
+        .c-carnet-val { font-size: 0.1in; font-weight: 900; color: #000; line-height: 1; }
+
+        .c-right-col {
+            flex: 1;
+            padding-left: 0.1in;
+            display: flex;
+            flex-direction: column;
+            gap: 0.04in;
+            z-index: 2;
+        }
+        .c-row {
+            display: flex;
+            width: 100%;
+        }
+        .c-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .c-row-full {
+            display: flex;
+            flex-direction: column;
+            margin-top: 0.02in;
+        }
+
+        .c-label { font-size: 0.06in; font-weight: 700; color: #111; line-height: 1.1; margin-bottom: 0.01in; }
+        .c-value { font-size: 0.075in; font-weight: 900; color: #000; line-height: 1.1; text-transform: uppercase; }
+        .c-value-inline { font-size: 0.075in; font-weight: 900; color: #000; line-height: 1.2; text-transform: uppercase; }
+
+        /* Marca de Agua Central */
+        .c-escudo-agua { 
+            position: absolute; 
+            top: 50%; 
+            left: 60%; 
+            transform: translate(-50%, -50%); 
+            width: 1.75in; 
+            height: 1.75in; 
+            object-fit: contain; 
+            opacity: 0.15; 
+            z-index: 1; 
+        }
+        
+        .c-gobierno-floating {
+            position: absolute;
+            bottom: 0.72in;
+            left: 1.1in;
+            right: 0.05in;
+            text-align: center;
+            font-size: 0.065in;
+            font-weight: 900;
+            color: #556b82;
+            z-index: 1;
+            line-height: 1.1;
+        }
+
+        .c-signatures-landscape {
+            position: absolute;
+            bottom: 0.02in;
+            left: 1in;
+            right: 0.05in;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+        }
+        .c-sig-block {
+            width: 48%;
+            text-align: center;
+            position: relative;
+            height: 0.65in;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .c-sello-img {
+            position: absolute;
+            bottom: 0.12in;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 0.65in;
+            width: 0.65in;
+            object-fit: contain;
+            opacity: 0.6; /* Translúcido para no tapar texto */
+            z-index: 1;
+        }
+        .c-firma-img {
+            position: absolute;
+            bottom: 0.14in;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 0.45in;
+            width: auto;
+            max-width: 140%;
+            z-index: 2;
+            mix-blend-mode: multiply; /* Asegura que la firma monte perfectamente el sello */
+        }
+        .c-sig-title {
+            font-size: 0.055in;
+            font-weight: 900;
+            position: relative;
+            z-index: 3;
+            color: #000;
+        }
+
+        /* =========================================
+           DISEÑO INTERNO DEL CARNET - VUELTO
+           ========================================= */
+        .cv-body-landscape { 
+            padding: 0.08in; 
+            font-size: 0.06in; 
+            position: relative; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+            box-sizing: border-box;
+            z-index: 2; 
+        }
+        .cv-label { font-weight: 600; color: #374151; font-size: 0.045in; line-height: 1.1;}
+        .cv-value { font-weight: 800; color: #000; font-size: 0.05in; line-height: 1.1;}
+        .cv-row { margin-bottom: 0.03in; }
+        
+        /* Utilidades UI */
+        .hidden-view { display: none !important; }
+
+        /* =========================================
+   DISEÑO INTERNO DEL CARNET - VUELTO
+   ========================================= */
+
+.cv-body-landscape { 
+
+    padding: 0.08in; 
+
+    font-size: 0.06in; 
+
+    position: relative; 
+
+    flex: 1; 
+
+    display: flex; 
+
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+    z-index: 2; 
+
+}
+
+.cv-label { 
+    font-weight: 600; 
+    color: #374151; 
+    font-size: 0.045in; 
+    line-height: 1.1;
+}
+
+.cv-value { 
+    font-weight: 800; 
+    color: #000; 
+    font-size: 0.05in; 
+    line-height: 1.1;
+}
+
+.cv-row { 
+    margin-bottom: 0.03in; 
+}
+
+
+/* =========================================
+   FOTO + FIRMA + HUELLA - VUELTO
+   ========================================= */
+
+.cv-biometria-footer {
+    position: absolute;
+
+    left: 0.10in;
+    bottom: 0.42in;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: flex-end;
+
+    gap: 0.15in;
+
+    z-index: 10;
+}
+
+.cv-biometria-item {
+    width: 0.68in;
+    height: 0.72in;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+/* FOTO */
+.cv-foto-v {
+    width: 0.55in;
+    height: 0.70in;
+
+    object-fit: cover;
+
+    border: 1px solid #d1d5db;
+}
+
+/* FIRMA */
+.cv-firma-v {
+    width: 0.68in;
+    height: 0.40in;
+
+    object-fit: contain;
+}
+
+/* HUELLA */
+.cv-huella-v {
+    width: 0.65in;
+    height: 0.65in;
+
+    object-fit: contain;
+}
